@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  nolang-mcp:
+    build: .
+    container_name: nolang-mcp
+    restart: unless-stopped
+    environment:
+      - NOLANG_API_KEY=${NOLANG_API_KEY}
+      - NOLANG_MCP_PORT=7310
+    ports:
+      - "7310:7310"
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: unless-stopped
+    depends_on:
+      - nolang-mcp
+    command: tunnel --url http://nolang-mcp:7310
+    volumes:
+      - ./logs:/logs
