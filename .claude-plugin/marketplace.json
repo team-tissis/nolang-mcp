@@ -1,0 +1,14 @@
+{
+  "name": "nolang",
+  "owner": {
+    "name": "mvrx"
+  },
+  "description": "The NoLang plugin for Claude Code. Make videos from a text request.",
+  "plugins": [
+    {
+      "name": "nolang",
+      "source": "./plugins/nolang",
+      "description": "Make videos from Claude Code with the NoLang CLI (nolang)."
+    }
+  ]
+}

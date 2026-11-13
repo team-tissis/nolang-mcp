@@ -1,0 +1,17 @@
+{
+  "description": "Shows tell_user from nolang output (the video or sign-in URL) on screen as a notification, without going through the model",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "command -v node >/dev/null 2>&1 || exit 0; node \"${CLAUDE_PLUGIN_ROOT}/hooks/tell-user.mjs\"", "timeout": 10 }]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "command -v node >/dev/null 2>&1 || exit 0; node \"${CLAUDE_PLUGIN_ROOT}/hooks/tell-user.mjs\"", "timeout": 10 }]
+      }
+    ]
+  }
+}

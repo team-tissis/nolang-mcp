@@ -1,0 +1,13 @@
+{
+  "name": "nolang",
+  "version": "0.0.1",
+  "description": "Make videos from Codex with the NoLang CLI (nolang). NoLang produces the script, visuals, voice and BGM.",
+  "author": {
+    "name": "mvrx"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "NoLang",
+    "shortDescription": "Make videos from a text request"
+  }
+}

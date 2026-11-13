@@ -1,0 +1,7 @@
+node_modules/
+*.tgz
+.DS_Store
+# Example outputs and work-in-progress drafts
+out/
+__pycache__/
+dist/

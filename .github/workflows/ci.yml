@@ -1,0 +1,20 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      # プラグインの中身が正本 (packages/cli・skills・hooks) どおりか + hook の単体テスト (CLI 本体のテストは nolang-backend の CI)
+      - run: npm run check
+      # npm に載る中身 (公開はしない)
+      - run: npm pack --dry-run
+        working-directory: packages/cli
+      # `claude plugin validate --strict` は Claude Code が要るので手元で (`npm run validate`)

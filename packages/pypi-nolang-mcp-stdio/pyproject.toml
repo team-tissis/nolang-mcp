@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nolang-mcp-stdio"
+version = "0.0.2"
+description = "Holds this name for NoLang (AI video generation): an MCP server with no video tools that tells the client how to install the official NoLang plugin or MCP connector."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+authors = [{name = "Mavericks, inc."}]
+keywords = ["nolang", "mcp", "claude-code", "codex", "video"]
+dependencies = []
+
+[project.urls]
+Homepage = "https://no-lang.com"
+Repository = "https://github.com/mvrks-inc/nolang-plugin"
+
+[project.scripts]
+nolang-mcp-stdio = "nolang_mcp_stdio:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nolang_mcp_stdio"]

@@ -1,0 +1,19 @@
+{
+  "name": "nolang",
+  "interface": {
+    "displayName": "NoLang"
+  },
+  "plugins": [
+    {
+      "name": "nolang",
+      "source": {
+        "source": "local",
+        "path": "./plugins/nolang"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

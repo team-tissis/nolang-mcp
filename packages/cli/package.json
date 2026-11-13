@@ -1,0 +1,38 @@
+{
+  "name": "@no-lang/cli",
+  "version": "0.0.1",
+  "description": "Official CLI for NoLang (AI video generation, no-lang.com): make videos from AI agents (Claude Code, Codex, …) or a shell. In Claude Code / Codex, install the plugin instead: claude plugin install nolang --marketplace mvrks-inc/nolang-plugin",
+  "keywords": [
+    "nolang",
+    "video",
+    "ai-agent",
+    "claude-code",
+    "codex",
+    "cli"
+  ],
+  "homepage": "https://no-lang.com",
+  "type": "module",
+  "bin": {
+    "nolang": "nolang.mjs"
+  },
+  "files": [
+    "nolang.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mvrks-inc/nolang-plugin",
+    "directory": "packages/cli"
+  }
+}

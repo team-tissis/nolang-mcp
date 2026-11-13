@@ -1,0 +1,16 @@
+{
+  "name": "nolang-plugin",
+  "private": true,
+  "description": "NoLang for AI agents: the CLI bootstrap, the make-video skill and the Claude Code / Codex plugin",
+  "type": "module",
+  "scripts": {
+    "test": "npm --prefix packages/cli test",
+    "build": "node scripts/build-plugins.mjs",
+    "check": "node scripts/build-plugins.mjs --check && npm test",
+    "validate": "claude plugin validate --strict . && claude plugin validate --strict plugins/nolang"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "Apache-2.0"
+}
