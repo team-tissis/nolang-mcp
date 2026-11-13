@@ -41,7 +41,7 @@ codex plugin marketplace add mvrks-inc/nolang-plugin
 codex plugin add nolang@nolang
 ```
 
-Restart after installing (in Claude Code, `/reload-plugins` also works). The CLI alone (no plugin) is also packaged for npm as `@no-lang/cli` (`npm install -g @no-lang/cli`, or `npx -y @no-lang/cli <command>`); both work once the package is published.
+Restart after installing (in Claude Code, `/reload-plugins` also works). The CLI alone (no plugin) is also packaged for npm as `@no-lang/cli` (`npm install -g @no-lang/cli`, or `npx -y @no-lang/cli <command>`).
 
 ### Requirements and limits
 
@@ -189,7 +189,7 @@ told to read the server's `spec.md`; for `nolang make` flags, `--help` (they are
 ## Distribution
 
 - **license**: Apache-2.0 (`LICENSE`).
-- **npm**: `@no-lang/cli` (the command name is `nolang`; not published yet). The unscoped `nolang` on npm is a separate package unrelated to NoLang; do not use it.
+- **npm**: `@no-lang/cli` (the command name is `nolang`). The unscoped `nolang` on npm is a separate package unrelated to NoLang; do not use it.
 - **PyPI**: [`nolang`](https://pypi.org/project/nolang/) and [`nolang-mcp-stdio`](https://pypi.org/project/nolang-mcp-stdio/). `nolang` only starts `@no-lang/cli` through `npx`; `nolang-mcp-stdio` only holds the name (an MCP server with no video tools; it tells the client how to connect NoLang).
 - **GitHub**: `mvrks-inc/nolang-plugin`. It installs with `claude plugin install nolang --marketplace mvrks-inc/nolang-plugin` (or `/plugin marketplace add mvrks-inc/nolang-plugin`).
 

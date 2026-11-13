@@ -41,7 +41,7 @@ codex plugin marketplace add mvrks-inc/nolang-plugin
 codex plugin add nolang@nolang
 ```
 
-入れたら起動し直す (Claude Code は `/reload-plugins` でもよい)。CLI だけ (プラグインなし) を使うための npm パッケージ `@no-lang/cli` も用意しています (`npm install -g @no-lang/cli` か `npx -y @no-lang/cli <command>`)。どちらも、パッケージの公開後に使えます。
+入れたら起動し直す (Claude Code は `/reload-plugins` でもよい)。CLI だけ (プラグインなし) を使うための npm パッケージ `@no-lang/cli` も用意しています (`npm install -g @no-lang/cli` か `npx -y @no-lang/cli <command>`)。
 
 ### 前提と制限
 
@@ -189,7 +189,7 @@ npm run validate    # claude plugin validate --strict (Claude Code が要る)
 ## 配布
 
 - **license**: Apache-2.0 (`LICENSE`)。
-- **npm**: `@no-lang/cli` (コマンド名は `nolang`・まだ公開していない)。npm の `nolang` (スコープ無し) は NoLang と無関係の別パッケージなので使わない。
+- **npm**: `@no-lang/cli` (コマンド名は `nolang`)。npm の `nolang` (スコープ無し) は NoLang と無関係の別パッケージなので使わない。
 - **PyPI**: [`nolang`](https://pypi.org/project/nolang/) と [`nolang-mcp-stdio`](https://pypi.org/project/nolang-mcp-stdio/)。`nolang` は `npx` で `@no-lang/cli` を起動するだけ、`nolang-mcp-stdio` は名前の確保だけ (動画の tool を持たない MCP サーバーで、NoLang のつなぎ方だけを返す)。
 - **GitHub**: `mvrks-inc/nolang-plugin`。`claude plugin install nolang --marketplace mvrks-inc/nolang-plugin` (か `/plugin marketplace add mvrks-inc/nolang-plugin`) で入る。
 
