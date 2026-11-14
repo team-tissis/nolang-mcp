@@ -3,7 +3,8 @@
 // NoLang studio — so that making one video does not ask the user dozens of times (a worker takes a job and writes a
 // part file again and again). It approves exactly three things:
 //   1. one plain command of this plugin's own CLI (`node <plugin>/cli/nolang.mjs …`) that cannot send a local file:
-//      `auth status`, `job take <dir>`, `wait <dir>`, and `make <dir>` with the flags listed in MAKE_FLAGS
+//      `auth status`, `job take <dir>`, `wait <dir>`, `status <video_id>` (it only reads a video's state), and `make <dir>`
+//      with the flags listed in MAKE_FLAGS
 //   2. a write of a studio part file inside the working directory (`…/stream/jobs/<job>/parts/NNN.txt`)
 //   3. a read of this plugin's own skill documents (they live outside the working directory)
 // Everything else — an upload (`assets upload`, `make --speech`), another endpoint (`--api`), a command chained to
@@ -16,6 +17,7 @@ import { plainWords } from "./tell-user.mjs";
 // Flags of `nolang make` that carry only text or a choice (none reads a local file or changes the endpoint)
 const MAKE_FLAGS = new Set(["--genre", "--type", "--mode", "--aspect", "--seconds", "--language", "--engine", "--request-text", "--editable", "--timeout"]);
 const TIMEOUT_ONLY = new Set(["--timeout"]);
+const STATUS_FLAGS = new Set(["--wait", "--until", "--timeout"]);
 
 const flagsWithin = (words, allowed) => words.every((word) => !word.startsWith("--") || allowed.has(word.split("=")[0]));
 
@@ -28,6 +30,7 @@ export function isPlumbingCommand(command, pluginRoot) {
   if (verb === "auth") return second === "status" && rest.length === 0;
   if (verb === "job") return second === "take" && rest.length >= 1 && !rest[0].startsWith("--") && flagsWithin(rest.slice(1), TIMEOUT_ONLY);
   if (verb === "wait") return Boolean(second) && !second.startsWith("--") && flagsWithin(rest, TIMEOUT_ONLY);
+  if (verb === "status") return Boolean(second) && !second.startsWith("--") && flagsWithin(rest, STATUS_FLAGS);
   if (verb === "make") return Boolean(second) && !second.startsWith("--") && flagsWithin(rest, MAKE_FLAGS);
   return false;
 }

@@ -15,6 +15,8 @@ test("the studio's plumbing commands of this plugin's CLI are approved", () => {
     `${CLI} job take /w/nolang-videos/a`,
     `node "${ROOT}/cli/nolang.mjs" job take "/w/nolang videos/a" --timeout 100`,
     `${CLI} wait /w/nolang-videos/a --timeout 420`,
+    `${CLI} status 0618bad9-3bff-4090-a941-a8c28f28199e`,
+    `${CLI} status 0618bad9-3bff-4090-a941-a8c28f28199e --wait --until playable --timeout 300`,
     `${CLI} make ./nolang-videos/a --genre explain --mode plus --aspect 16:9 --request-text 'a | b; c' --engine host`,
     `${CLI} make ./nolang-videos/a --genre film --request-text "x" --seconds 30 --language ja`,
   ]) {
@@ -30,6 +32,8 @@ test("a command that can send a local file, change the endpoint or run something
     `${CLI} make ./a --genre explain --request-text x --api https://example.com`,
     `${CLI} auth login`,
     `${CLI} auth status --api https://example.com`,
+    `${CLI} status 0618bad9-3bff-4090-a941-a8c28f28199e --api https://example.com`,
+    `${CLI} status`,
     `${CLI} generate --request-text x`,
     `${CLI} auth status && rm -rf ~`,
     `${CLI} make ./a --request-text "$(cat ~/.ssh/id_rsa)"`,
