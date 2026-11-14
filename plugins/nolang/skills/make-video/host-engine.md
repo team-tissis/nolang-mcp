@@ -22,14 +22,14 @@ All paths in this file are relative to this skill's directory. For how to run `n
    - **Codex**: use the ordinary tool that starts a subagent. Pass the whole text of "Instructions for the author" or "Instructions for a worker" below, followed by the row's `prompt` as it is. No named agent definition, TOML file, model, reasoning effort or output limit needs to be set.
    - An older CLI prints `agent: nolang:studio-author` / `nolang:studio-worker` instead of `role` — treat them as the same roles.
    - If starting one more worker is refused because of a limit, go on with the author and the workers that are running. Do not repeat the same start.
-3. **Wait**: run the `wait` command as it is in the shell (in Claude Code, Bash timeout 600000). If the environment returns an asynchronous session, poll that session — do not run the command again. Carry over the endpoint and the environment variables you used for `make`.
+3. **Wait**: run the `wait` command as it is in the shell (in Claude Code, Bash timeout 600000). If the environment returns an asynchronous session, poll that session — do not run the command again. Carry over the endpoint and the environment variables you used for `make`. If the output has `still_starting: true`, the author has not written its first file yet — that is not a failure; run the same `wait` command again.
 4. **Tell the user**: the output of `wait` has the same shape as `nolang make` (`tell_user`, `watch_url`). Pass it on at once, as in step 4 of §S. On failure (`ok: false`), step 5 of §S.
 5. **Keep the session open** until every subagent has finished. Playback starting is not the end of generation — the workers still write the remaining cuts, and in some environments ending the parent stops them. In a non-interactive run (`claude -p`), do not end your turn until every worker has finished.
 
 ## Rules
 
 - You do not take jobs and you do not write the draft in a worker's place. The workers stop by themselves when the studio ends; do not read their results and do not send them more instructions.
-- If the author has not written its first file within 170 seconds, look at the error and the log (`<dir>/stream/run.out`). In Claude Code, an author that never starts usually means the plugin's `nolang:studio-author` / `nolang:studio-worker` agent types are missing (the plugin is old) — make the video with `nolang generate` or "A" in `write-yourself.md`. In Codex, the lack of a named agent is not a reason to give up on the host engine.
+- The author has 600 seconds to write its first file. If `wait` fails because it did not, look at the error and the log (`<dir>/stream/run.out`). In Claude Code, an author that never starts usually means the plugin's `nolang:studio-author` / `nolang:studio-worker` agent types are missing (the plugin is old) — make the video with `nolang generate` or "A" in `write-yourself.md`. In Codex, the lack of a named agent is not a reason to give up on the host engine.
 - A worker uses only three things: reading and writing files inside the video's directory, and the shell for `nolang job take` (taking a job). In Claude Code the plugin's hook approves these without asking; anywhere else, if asked for these permissions, allow them.
 - `nolang edit` has no host engine. To fix a video, write `[video:<video_id>]` in the request text and run `nolang make … --engine host` (a remake that takes the video as its reference).
 - Each worker reads the shared documents (about 8 thousand tokens; the author also reads its own request, about 17 thousand), so this uses more of the user's LLM usage than the default `nolang make`.
@@ -45,7 +45,7 @@ You are the "author" worker of NoLang's video studio. The studio is already runn
    - the last file = the body of the last cut, then the `=== end ===` line
 
    Joined in order, the files must be the full reply, with each header line written exactly once (end each file with a newline). Add no preamble, no explanation and no code fences.
-3. Save each file as soon as it is ready, one at a time — do not write them all after finishing, and never rewrite a file you have written. Before `001.txt`, decide only the order of the cuts and each cut's role; decide what goes into a cut when you write that cut's file. The first file must arrive within 170 seconds of your start, and each later one within 110 seconds of the one before.
+3. Save each file as soon as it is ready, one at a time — do not write them all after finishing, and never rewrite a file you have written. Before `001.txt`, decide only the order of the cuts and each cut's role; decide what goes into a cut when you write that cut's file. Write the first file as soon as you have read both files — it must arrive within 600 seconds of your start, and each later one within 110 seconds of the one before.
 4. When you are done, reply with just "done". Do not read other files, run checks or ask questions.
 
 ## Instructions for a worker
