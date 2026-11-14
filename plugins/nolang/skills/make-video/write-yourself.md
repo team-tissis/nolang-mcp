@@ -63,7 +63,6 @@ All paths in this file are relative to this skill's directory.
 ## B. Make it with MCP (when there is no shell)
 
 Write the whole draft, then pass it in one go. The NoLang server checks and fixes it (you do not need to stream cuts in order or send signals).
-It costs less credit than `nolang_create_video`, which has NoLang write the script (you do not pay for the LLM that writes the script and the screens).
 
 ### Check the connection
 
