@@ -102,8 +102,9 @@ nolang-plugin/
   packages/pypi-nolang/                # PyPI `nolang` = a launcher that starts @no-lang/cli through npx (holds the name)
   packages/pypi-nolang-mcp-stdio/      # PyPI `nolang-mcp-stdio` = holds the name; an MCP server that only tells how to connect NoLang
   skills/make-video/                   # Source of truth for the skill (makes videos with the CLI; also has the MCP steps for connector-only clients). Holds no copies of the docs
+  agents/                              # Subagents that take the roles for `nolang make --engine host` (Claude Code only)
   hooks/                               # Claude Code hook: shows tell_user from nolang's output (video and sign-in URLs) on screen as a notification
-  plugins/nolang/                      # Plugin package. cli/, skills/ and hooks/ are made from the source of truth by npm run build — do not edit them directly
+  plugins/nolang/                      # Plugin package. cli/, skills/, agents/ and hooks/ are made from the source of truth by npm run build — do not edit them directly
     .claude-plugin/plugin.json         #   For Claude Code
     .codex-plugin/plugin.json          #   For Codex (no hooks listed)
   .claude-plugin/marketplace.json      # Marketplace for Claude Code (marketplace nolang; one plugin, nolang)
@@ -119,7 +120,7 @@ nolang-plugin/
 nolang auth login [--device | --browser] [--background] [--language <ja|en|…>] | login --no-browser | wait | complete '<URL>' | status | logout | env
 nolang doctor                         Checks the API endpoint, the login, and whether you can make videos (balance)
 nolang account [--language <ja|en|…>]   User language, plan, balance, whether free video generation is available, credits per minute of length, whether you can make one now (consumes nothing). --language changes the user's language
-nolang make <dir> --type <type> --request-text "<request text>" [--aspect 16:9|9:16] [--seconds seconds|auto (default auto)] [--language <ja|en|…> (only to fix the video language)] [--engine claude|codex]
+nolang make <dir> --genre <explain|film> --request-text "<request text>" [--aspect 16:9|9:16] [--seconds seconds|auto (default auto)] [--language <ja|en|…> (only to fix the video language)] [--engine claude|codex|host]
                                       Makes the video with the same steps as the NoLang studio (the skill's standard). Returns the URL once it can be played. For role and editable-mode flags, see nolang make --help
 nolang generate --request-text "<request text>" [--aspect 16:9|9:16] [--seconds seconds] [--video-language <ja|en|…>] [--confirmed] [--idempotency-key key] [--wait]
                                       The NoLang server writes the script and the screens (the same entry point as home on the web; no studio). If the video language is omitted, it is the language of the request text. If stage=unsupported, show the blockers and resend with --confirmed
@@ -143,6 +144,7 @@ nolang assets upload <file>… [--name display-name] [--speakers N]   Uploads lo
 - The CLI body is a bundle shipped by the server at the API endpoint (`GET <api>/agent/client/`, a tar.gz of just under 1 MB). On every start, `nolang` checks the local bundle (`~/.config/nolang/client/<fingerprint>/`) with `If-None-Match` (one round trip; if the server cannot be reached, it runs on the local bundle) and fetches it again if it changed. On the first start, when there is no local bundle, if the server cannot be reached or returns 5xx, it retries up to 3 times in total, waiting 3 seconds and then 6 seconds (to ride out a server swap; about 70 seconds at most). There is no version number; the fingerprint = the sha256 of the tar.gz. This README has no flag table — `nolang make --help` prints the one from the same version as the server.
 - The bundle (= the code that runs) is fetched only from production (`api.no-lang.com`). The server build signs the production bundle with Ed25519, and the bootstrap verifies it with the public key (built into `packages/cli/nolang.mjs`) before running it — a bundle with no signature or a signature that does not match is not run. `--api` may be given only once. It fetches from another NoLang server (a local stack on `localhost` included) only when a person writes `NOLANG_CLIENT_TRUSTED_ORIGIN=<that URL>` in the shell (bundles from that origin run even without a signature). To run the CLI from a local checkout, use `NOLANG_CLIENT_DIR` (no fetch).
 - Link notifications: when a command's output has `tell_user` (a message that includes the video or sign-in URL), the plugin's hook (`hooks/`) shows it as a notification on the Claude Code screen without going through the model (it arrives even if the model forgets to write the link). It also fires when `nolang` exits with an error (sign-in needed, not enough credit). It is shown only when the command is one plain `nolang` invocation (not `nolang …; something else`, a pipe, or `cat` of a file), and only when every link in the message is on `no-lang.com` (or `localhost`), so other output cannot pose as a NoLang notification.
+- Permission prompts: making one video takes dozens of small steps (a worker takes a job, writes a part file, and repeats). The plugin's hook approves only that plumbing without asking: `auth status`, `job take`, `wait` and a `make` that carries only text and choices, run as one plain command of this plugin's own CLI; a write of a studio part file (`…/stream/jobs/<job>/parts/NNN.txt`) inside the working directory; and a read of the plugin's own skill documents. Anything that can send a local file (`assets upload`, `make --speech`), another endpoint (`--api`), a command chained to something else, and every other file still go through Claude Code's normal permission prompt.
 - API endpoint: `--api <URL>` → environment variable `NOLANG_API_URL` → production (`https://api.no-lang.com`). It is a URL only; there is no command that selects and saves an endpoint (point at a non-production NoLang server with `NOLANG_API_URL` and `NOLANG_CLIENT_TRUSTED_ORIGIN` in the shell). Logins are kept per endpoint, and signing in does not change the endpoint.
 - Sign-in: on a local machine, including an agent's `--background`, it uses browser authorization (a browser opens and you just approve; no code to enter. If it cannot start, it switches to device authorization automatically). SSH, remote containers, Docker, WSL and Linux without a display choose device authorization: enter the URL and code in a browser and approve (no port forwarding needed). The agent receives the instructions (and the code, for device authorization) with `--background` and checks completion with `nolang auth wait`. You can choose explicitly with `--device` / `--browser`. Even if the browser authorization's return address gives a connection error, you can paste it back into the login already started with `auth complete '<URL after approval>'` (also works with `--background`). The token is in `~/.config/nolang/credentials.json` (0600) and is refreshed automatically when it expires (sign in again if it is not used for 30 days).
 - Non-interactive use such as CI: put an access token (the one `eval "$(nolang auth env)"` outputs; it expires in 1 hour and the CLI does not refresh it) in `NOLANG_TOKEN`. An API key (`nlg-c-…`) does not work with the CLI or MCP (403; it is for the NoLang API).
@@ -154,14 +156,18 @@ nolang assets upload <file>… [--name display-name] [--speakers N]   Uploads lo
 
 Codex runs in a temporary environment that shares only `auth.json` from the original `CODEX_HOME` (default `~/.codex`) and does not load the user's settings, hooks, plugins, MCP or conversation history. The model is that Codex CLI's default. Authentication with only an API key environment variable, or only a keyring, is not supported at present. A record of each call (role, effort, duration, tokens) is kept in `stream/run.jsonl`, and errors in `stream/codex_*.err`.
 
-Draft checks, assets and rendering for the CLI / MCP use the same NoLang server. The automatic author, staff and fixer are written by your local LLM's CLI (Claude Code or Codex), so remote MCP clients without a shell use `nolang_create_video` (the server writes) or the steps for writing the draft yourself and submitting it.
+In Codex, the plugin prefers `--engine codex` when the local CLI and its authentication are available, even if subagents are available. When the CLI or its authentication is unavailable before generation starts, it falls back to `--engine host` if the session has a shell and subagents.
+
+`nolang make ... --engine host` starts no LLM CLI: the subagents of the session that called `nolang` write the draft. Claude Code uses it when the `claude` command is not available. How to start the roles and how many to run at once are in the skill's `host-engine.md`. Codex needs no agent definition and no extra setting for this fallback.
+
+Draft checks, assets and rendering for the CLI / MCP use the same NoLang server. The author, staff and fixer are written by your local LLM (its CLI, or the subagents of the host session), so remote MCP clients without a shell use `nolang_create_video` (the server writes) or the steps for writing the draft yourself and submitting it.
 
 ## Development
 
-Edit only the source of truth (`packages/cli/`, `skills/`, `hooks/`). After editing:
+Edit only the source of truth (`packages/cli/`, `skills/`, `agents/`, `hooks/`). After editing:
 
 ```
-npm run build       # Source of truth → plugins/nolang/ (rebuilds cli/, skills/ and hooks/, and aligns the manifest version with the bootstrap)
+npm run build       # Source of truth → plugins/nolang/ (rebuilds cli/, skills/, agents/ and hooks/, and aligns the manifest version with the bootstrap)
 npm run check       # Whether plugins/ matches the source of truth + the bootstrap and hook tests (same as CI)
 npm run validate    # claude plugin validate --strict (needs Claude Code)
 ```

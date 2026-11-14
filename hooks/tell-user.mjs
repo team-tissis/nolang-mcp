@@ -39,7 +39,7 @@ export function tellUserOf(output) {
 // Split a shell command into words, or null when it is more than one plain command: an unquoted `;` `&` `|` newline,
 // redirection, parenthesis or comment, or a command substitution (`$(…)`, a backtick) outside single quotes.
 // Quoted text (the request text of `nolang make`) may contain any of these
-function plainWords(command) {
+export function plainWords(command) {
   const words = [];
   let word = null;
   let quote = null;

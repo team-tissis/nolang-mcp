@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Build the plugin package (plugins/nolang) from the sources of truth (packages/cli, skills/, hooks/) and set the
+// Build the plugin package (plugins/nolang) from the sources of truth (packages/cli, skills/, agents/, hooks/) and set the
 // manifests' version to the CLI's (the bootstrap's).
 // The CLI body (including the reference docs) is not in the package — the NoLang server serves it at `agent/client/` and
 // the bootstrap fetches it on every start.
@@ -35,6 +35,9 @@ async function buildInto(pluginDir) {
   await cp(join(ROOT, "hooks"), join(pluginDir, "hooks"), { recursive: true, filter: keep });
   await rm(join(pluginDir, "skills"), { recursive: true, force: true });
   await cp(join(ROOT, "skills"), join(pluginDir, "skills"), { recursive: true, filter: keep });
+  // The subagents that take the roles for `nolang make --engine host` (read by Claude Code only)
+  await rm(join(pluginDir, "agents"), { recursive: true, force: true });
+  await cp(join(ROOT, "agents"), join(pluginDir, "agents"), { recursive: true, filter: keep });
   await cp(join(ROOT, "LICENSE"), join(pluginDir, "LICENSE"));
   for (const manifest of MANIFESTS) {
     const path = join(pluginDir, manifest);

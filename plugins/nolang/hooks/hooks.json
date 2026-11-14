@@ -1,6 +1,12 @@
 {
-  "description": "Shows tell_user from nolang output (the video or sign-in URL) on screen as a notification, without going through the model",
+  "description": "Shows tell_user from nolang output (the video or sign-in URL) on screen as a notification, and approves the NoLang studio's own plumbing (taking a job, writing a part file) without a permission prompt",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Read",
+        "hooks": [{ "type": "command", "command": "command -v node >/dev/null 2>&1 || exit 0; node \"${CLAUDE_PLUGIN_ROOT}/hooks/allow-nolang.mjs\"", "timeout": 10 }]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Bash",
